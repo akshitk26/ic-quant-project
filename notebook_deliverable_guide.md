@@ -1,244 +1,249 @@
 # Defense vs Tech Notebook Companion Guide
 
+This guide stays in sync with [defense_vs_tech_analysis.ipynb](/Users/akshit/Code/IC%20Quant%20Project/defense_vs_tech_analysis.ipynb:1) and explains the notebook's final scope, structure, and presentation angle.
+
 ## Purpose
 
-This file tracks the notebook structure, documents major implementation choices, and gives writing guidance for the required PDF summary and 1-slide presentation. It should stay in sync with the notebook at [defense_vs_tech_analysis.ipynb](/Users/akshit/Code/IC%20Quant%20Project/defense_vs_tech_analysis.ipynb:1).
+The notebook answers a focused question:
 
-## Current Notebook Structure
+How well do major defense names (`LMT`, `NOC`, `GD`) diversify or track the technology sector proxy `XLK` over the last five years?
 
-1. Title and project framing
-2. Environment bootstrap and dependency installation
+The final version is cleaner than the earlier drafts, but it still keeps the two strategy sections you wanted:
+
+- the regime strategy
+- the momentum-with-defense-filter strategy
+
+The notebook now balances three things:
+
+- clean descriptive analysis
+- light regression / regularization modeling
+- a compact strategy section that illustrates what did and did not work
+
+## Final Notebook Structure
+
+1. Title and framing
+2. Environment bootstrap
 3. Imports and config
-4. Data-choice explanation
-5. Data loading and preprocessing
-6. Statistical helper functions
-7. Visualization helper functions
-8. Regime concepts and interpretation notes
-9. Section 1: core correlation and risk analysis
-10. Section 2: regime strategy, including the original biased false-positive chart and the corrected lagged version
-11. Section 3: drawdown-triggered lowest-beta strategy
-12. Section 4: momentum with defense filter strategy
-13. Insight generation
-14. Optional exports
-15. Reflection prompts
+4. Data choices and cleaning notes
+5. Data loading / preprocessing
+6. Concepts for `R^2`, `TSS`, `RSS`, Ridge, and Lasso
+7. Core statistics, regression diagnostics, regularization, and strategy tables
+8. Core visualizations
+9. Chart interpretation notes
+10. Strategy Section 1: regime strategy
+11. Strategy Section 2: momentum with defense filter
+12. Insight generation
+13. Reflection prompts
+
+## What Was Removed
+
+To keep the notebook cleaner and easier to present, the final version removes:
+
+- rolling beta plots
+- rolling drawdown path plots
+- drawdown-triggered lowest-beta strategy
+- extra strategy clutter beyond the two strategy sections above
+- hedged spread visuals
+
+Those sections made the notebook longer without improving the main story enough.
 
 ## Current High-Level Decisions
 
-- Notebook deliverable is a real `.ipynb`, matching the assignment PDF.
-- Notebook now includes a bootstrap cell that installs missing packages into the active kernel before the main imports run.
-- Returns, volatility, correlation, and hedge analysis use `Adj Close`.
-- OHLCV is still downloaded so the dataset remains faithful to the stock-data requirement.
-- Missing values are audited before cleaning.
-- Forward fill is used conservatively after the audit so small data gaps do not break rolling calculations.
-- Main rolling window is `30` trading days.
-- Main analytical emphasis is:
-  - correlation matrix
-  - rolling volatility
-  - rolling correlation versus XLK
-  - rolling beta versus XLK
-  - drawdown analysis
-  - volatility-regime analysis
-  - OLS hedge ratio and hedged spread interpretation
-- A simple regime-switching strategy benchmark is now included:
-  - low-vol regime: hold `XLK`
-  - medium-vol regime: hold the defense stock with the strongest recent trailing return
-  - high-vol regime: hold the defense stock with the lowest recent rolling volatility
-- Strategy signals are now applied with a one-trading-day delay to avoid obvious lookahead bias in the backtest.
-- A second strategy test is now included:
-  - if `XLK` drawdown breaches `-10%`, switch the next day into the defense stock with the lowest rolling beta to `XLK`
-  - otherwise remain in `XLK`
-- A third strategy test is now included:
-  - keep `XLK` by default
-  - only rotate if `XLK` 30-day momentum is negative
-  - require a defense stock to have positive 30-day momentum and lower rolling volatility than `XLK`
-  - if multiple defense stocks qualify, choose the one with the strongest momentum
-- The notebook now explicitly preserves the original biased regime chart as a cautionary example of a false positive.
-- Strategy discussion remains high level. The notebook is analytical first, not a full trading-system build.
+- The deliverable is a real `.ipynb` notebook.
+- Data source is Yahoo Finance through `yfinance`.
+- The main price field is `Adj Close`.
+- Missing values are audited first, then forward-filled conservatively.
+- Analysis uses daily data from `2020-01-01` through `2025-12-31`.
+- The main rolling window is `30` trading days.
+- The notebook is analytical first, but still includes two compact strategy diagnostics.
 
-## Why These Choices Make Sense
+## What the Notebook Covers
 
-- `Adj Close` is the best field for return analysis because it reflects investor-relevant price adjustments.
-- A 30-day rolling window is short enough to reveal regime shifts but long enough to smooth daily noise.
-- Rolling beta adds a stronger explanation of sensitivity than correlation alone because it measures magnitude, not just direction.
-- OLS hedge analysis gives a simple and explainable modeling section that fits the assignment's statistical-analysis requirement without overengineering the project.
-- Rolling metrics support a more credible conclusion than one full-period average because relationships between sectors change over time.
+### Data Cleaning and Preprocessing
 
-## What the Notebook Already Covers for the Rubric
+- downloads Yahoo Finance history for `LMT`, `NOC`, `GD`, and `XLK`
+- checks missing values before cleaning
+- aligns the price series into one table
+- forward-fills small gaps
+- computes daily returns
+- normalizes price performance to a common base of `100`
 
-### Data Collection & Cleaning
+### Exploratory Data Analysis
 
-- Uses Yahoo Finance via `yfinance`
-- Includes a kernel-local dependency bootstrap step to reduce environment issues
-- Downloads market data for `LMT`, `NOC`, `GD`, and `XLK`
-- Audits missing values
-- Cleans and forward-fills price data
-- Computes daily returns
+- normalized price performance chart
+- 30-day rolling annualized volatility chart
+- full-period correlation heatmap
+- 30-day rolling correlation versus `XLK`
+- return distribution comparison
+- regime summary table based on 30-day `XLK` volatility buckets
 
-### EDA & Visualizations
+### Statistical Modeling
 
-- Normalized performance line chart
-- Rolling volatility chart
-- Correlation matrix heatmap
-- Rolling correlation chart
-- Rolling beta chart
-- Return distributions
-- Cumulative hedged spread chart
-- Drawdown chart
-- Regime-strategy versus `XLK` comparison chart
-- Biased regime-strategy versus `XLK` cautionary chart
-- Drawdown-triggered lowest-beta strategy versus `XLK` comparison chart
-- Momentum-defense filter strategy versus `XLK` comparison chart
-
-### Modeling / Statistical Analysis
-
-- OLS regressions of each defense stock against `XLK`
-- Hedge ratio estimation
-- Rolling beta versus `XLK`
-- Regime table based on `XLK` rolling volatility
-- Simple regime-switching backtest compared with `XLK`
-- Backtest now uses one-day-lagged signals rather than same-day execution
-- Drawdown-triggered lowest-beta strategy compared with `XLK`
-- Momentum-defense filter strategy compared with `XLK`
-- Regression diagnostics:
+- pair regressions of each defense stock on `XLK`
+- reported diagnostics:
+  - correlation
+  - beta
+  - alpha
   - `R^2`
-  - adjusted `R^2`
-  - RMSE
-  - MAE
-  - AIC
-  - BIC
-- Volatility-regime summary table with a safe fallback if the sample does not produce three clean volatility buckets
+  - `RMSE`
+  - `MAE`
+  - `RSS`
+  - `TSS`
+  - `RSS / TSS`
+- simple predictive comparison using:
+  - OLS
+  - Ridge
+  - Lasso
 
-### Insights & Interpretation
+### Strategy Diagnostics
 
-- Auto-generated key insights
-- High-level strategy framing
-- Regime definitions explained directly in the notebook
-- Explicit comparison between biased and unbiased backtests
-- Multiple strategy tests with progressively narrower decision rules
-- Reflection questions for the written report
+- biased regime strategy chart to show a false positive created by same-day information leakage
+- corrected lagged regime strategy chart
+- momentum-with-defense-filter strategy chart
+- summary tables for both strategies
 
-## How to Structure the PDF Summary
+These sections help show that strategy intuition needed to be tested carefully rather than assumed.
 
-Target length: roughly 1-3 pages, but quality matters more than exact page count.
+## Rubric Mapping
 
-Recommended structure:
+### 1. Data Cleaning / Preprocessing
 
-### 1. Project Overview
+Rubric item:
+Handle missing values, inconsistent formats, and structural issues.
 
-- State the question clearly:
-  - How did defense contractors behave relative to the technology sector from 2020 to 2025?
-- Explain why this is interesting:
-  - sector diversification
-  - risk behavior
-  - regime changes
+Notebook match:
+- missing-value audit table
+- unified adjusted-close extraction
+- aligned date index across tickers
+- conservative forward fill
 
-### 2. Dataset and Source
+Rubric item:
+Perform any necessary normalization, resampling, or smoothing.
 
-- Mention Yahoo Finance and `yfinance`
-- List tickers:
-  - `LMT`
-  - `NOC`
-  - `GD`
-  - `XLK`
-- State time period:
-  - `2020-01-01` to `2025-12-31`
-- Mention fields downloaded:
-  - OHLCV plus `Adj Close`
-- Explain that `Adj Close` was used for return analysis
+Notebook match:
+- normalized price chart with base `100`
+- rolling 30-day volatility and correlation windows for smoothing
 
-### 3. Methods
+### 2. Exploratory Data Analysis
 
-- Briefly explain:
-  - data cleaning and missing-value handling
-  - daily return calculation
-  - 30-day rolling volatility
-- return correlation matrix
-- rolling correlation versus `XLK`
-- rolling beta versus `XLK`
-- drawdown comparison
-- volatility-regime classification
-- regime-switching benchmark logic
-- drawdown-triggered lowest-beta logic
-- momentum-defense filter logic
-- OLS hedge ratio estimation
-- Keep this section concise and readable for a non-technical audience
+Rubric item:
+Generate time-series visualizations to highlight key patterns or anomalies.
 
-### 4. Key Findings
+Notebook match:
+- normalized performance
+- rolling volatility
+- rolling correlation
+- return distributions
+- strategy comparison charts
 
-- Use at least 2 visuals from the notebook
-- Focus on 3-4 concrete findings, such as:
-  - which stock had the highest return
-  - which had the lowest volatility
-- which defense name was least correlated with tech
-- which defense name had the lowest beta to tech during stress periods
-- which defense name had the shallowest drawdowns
-- whether correlations changed materially over time
-- whether the simple regime strategy improved risk-adjusted behavior against `XLK`
-- whether the strategy still holds up after removing lookahead bias
-- whether the drawdown-triggered lowest-beta rule improves drawdown control or just sacrifices upside
-- whether the momentum-defense filter preserves enough tech upside while avoiding weak periods
-- which stock had the cleanest hedge relationship with `XLK`
+Rubric item:
+Compute and visualize moving averages, rolling volatility, correlations, or autocorrelation structures.
 
-### 5. Interpretation / Strategy Implication
+Notebook match:
+- rolling volatility
+- rolling correlation
+- momentum filter logic indirectly uses rolling trend information
 
-- Keep this high level, not overly prescriptive
-- Good framing examples:
-  - diversification benefit was unstable over time
-  - some defense names behaved more like market-sensitive cyclicals than expected
-  - rolling analysis suggests static assumptions are weaker than dynamic monitoring
+Rubric item:
+Segment data into regimes or patterns.
 
-### 6. Reflection
+Notebook match:
+- volatility regime table using 30-day `XLK` volatility terciles
+- regime strategy section based on low / medium / high volatility states
 
-- Briefly mention:
-  - limitations of the analysis
-  - what you would extend next
-  - why rolling metrics improved the analysis over simple averages
+### 3. Statistical Modeling or Forecasting
 
-## How to Structure the Single Slide
+Rubric item:
+Choose and apply a suitable time-series model.
 
-Goal: one polished takeaway, not a mini-report.
+Notebook match:
+- pair regression framework
+- next-day predictive comparison using lagged-return features with OLS, Ridge, and Lasso
 
-Recommended layout:
+Rubric item:
+Evaluate model performance using appropriate metrics.
 
-- Title:
-  - `Defense vs Tech: Diversifier or Just Another Risk Asset?`
-- Main visual:
-  - rolling correlation versus `XLK`
-  - or rolling volatility if that tells the cleaner story
-- 2-3 short takeaway bullets
-- One bottom-line sentence:
-  - example: `Defense names were not consistently low-correlation hedges; the relationship with tech changed materially across market regimes.`
+Notebook match:
+- `R^2`
+- `RMSE`
+- `MAE`
+- `RSS`
+- `TSS`
 
-## Best Candidate Visuals for the Report and Slide
+### 4. Insight Generation
 
-- Best for explaining relative performance:
-  - normalized price performance
-- Best for risk story:
-  - 30-day rolling volatility
-- Best for diversification story:
-  - correlation matrix
-  - rolling correlation versus `XLK`
-- Best for a more advanced angle:
-  - cumulative hedged spread chart
-  - rolling beta versus `XLK`
-  - regime strategy versus `XLK`
+Rubric item:
+Summarize meaningful observations or anomalies from the data.
 
-## What To Update Here Whenever the Notebook Changes
+Notebook match:
+- final printed takeaways
+- chart notes section
+- biased vs corrected regime strategy comparison
 
-Each time the notebook is edited, update this file if any of the following changes:
+Rubric item:
+Provide commentary on temporal trends, relationships, or predictive dynamics.
 
-- tickers
-- sample period
-- cleaning method
-- rolling window
-- model choice
-- chart set
-- export behavior
-- written-report recommendations
+Notebook match:
+- normalized performance interpretation
+- changing rolling correlations
+- regression fit comparisons
+- regularization comparison results
+- strategy results showing how difficult it was to beat `XLK`
 
-## Next Likely Improvements
+Rubric item:
+Propose basic high-level strategy implications based on findings.
 
-- Add a rolling beta chart versus `XLK`
-- Add drawdown plots
-- Add sector-event annotations for major macro or geopolitical periods
-- Add a polished export workflow for report-ready PNG files
+Notebook match:
+- regime strategy section
+- momentum filter section
+- final reflection questions
+
+## What to Emphasize in the PDF Summary
+
+Keep the PDF concise. A good structure is:
+
+1. Question
+   Compare major defense stocks with `XLK` to test whether defense behaves as a useful diversifier or partial hedge to tech.
+
+2. Data and method
+   Explain Yahoo Finance source, `Adj Close`, missing-value audit, forward fill, daily returns, 30-day rolling windows, pair regressions, and the two compact strategy tests.
+
+3. Main findings
+   Focus on:
+   - long-run relative performance
+   - volatility differences
+   - unstable rolling correlation
+   - which stock was least tied to `XLK`
+   - whether predictive models added much value
+   - why the biased regime strategy overstated performance
+
+4. Conclusion
+   State whether the evidence supports a simple “defense hedges tech” story and whether simple overlay strategies added value over holding `XLK`.
+
+## What to Put on the One-Slide Deck
+
+A clean one-slide structure:
+
+- Title at the top:
+  `Defense vs Tech: Do Defense Stocks Really Diversify XLK?`
+
+- Left side:
+  one chart, preferably rolling correlation or normalized performance
+
+- Right side:
+  3 short bullets
+  - defense generally lagged `XLK` in cumulative performance
+  - correlation with `XLK` changed materially over time
+  - simple defense-overlay strategies were not enough to reliably beat `XLK`
+
+- Bottom:
+  one-sentence conclusion
+
+## Best Talking Points
+
+- `Adj Close` is the right field for return analysis because it reflects investor-relevant adjustments.
+- A single full-period correlation is not enough; rolling correlations show the relationship changes over time.
+- Some defense names are less tied to `XLK` than others, but none provide a perfect hedge.
+- The regularization section adds a modest predictive extension without making the notebook feel overbuilt.
+- The biased regime chart is useful because it shows how easy it is to create a false positive in backtesting.
+- The strongest final takeaway is about the limits of simple sector-hedging assumptions.

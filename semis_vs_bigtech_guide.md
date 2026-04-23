@@ -15,8 +15,10 @@ This guide tracks the new `SOXX` versus `QQQ` notebook and keeps the deliverable
 7. Statistics and modeling
 8. Section 1: core pair analysis
 9. Section 2: regression diagnostics
-10. Section 3: strategy test
-11. Quick interpretation prompts
+10. Section 3: semis amplification strategy
+11. Section 4: mean-reversion pairs trade
+12. Section 5: mean reversion with QQQ trend filter and asymmetric SOXX short
+13. Quick interpretation prompts
 
 ## Current High-Level Decisions
 
@@ -34,7 +36,10 @@ This guide tracks the new `SOXX` versus `QQQ` notebook and keeps the deliverable
 - GARCH is included to show time-varying volatility more formally than the rolling-vol chart.
 - RSS and TSS are included through the pair regression diagnostics.
 - Regularization is included through a simple OLS/Ridge/Lasso next-day return comparison.
-- The strategy defaults to `QQQ` and only rotates into `SOXX` in stronger semi-led tech regimes.
+- The notebook now contains three strategy variants:
+  - semis amplification
+  - raw stat-arb mean reversion
+  - stat-arb mean reversion with a `QQQ` trend filter and asymmetric `SOXX` short
 
 ## What the Notebook Covers
 
@@ -69,10 +74,13 @@ This guide tracks the new `SOXX` versus `QQQ` notebook and keeps the deliverable
 - whether semis acted like a leveraged expression of big tech
 - whether volatility clustered materially during AI-driven periods
 - whether the selective semis-tilt strategy improved on `QQQ`
+- whether spread dislocations were more useful than outright sector rotation
+- whether a broad-tech trend filter reduced stat-arb drawdowns
+- whether adding a selective SOXX short improved weak-regime performance
 
 ## Strategy Logic
 
-The strategy is intentionally narrow:
+### 1. Semis Amplification
 
 - hold `QQQ` by default
 - switch into `SOXX` only when:
@@ -80,7 +88,20 @@ The strategy is intentionally narrow:
   - `SOXX / QQQ` relative strength is above its 50-day moving average
   - `SOXX` rolling volatility is not too far above `QQQ`
 
-This is meant to capture the idea that semiconductors can act like a higher-beta expression of a strong tech regime, but only under selective conditions.
+### 2. Raw Stat-Arb Mean Reversion
+
+- compute a rolling Z-score on the `SOXX / QQQ` ratio
+- buy `SOXX` when the ratio is unusually cheap
+- otherwise default back to `QQQ`
+
+### 3. Filtered Stat-Arb Mean Reversion With Short Side
+
+- keep the same spread Z-score signal
+- buy the `SOXX` dip when `QQQ` is still above its 50-day moving average
+- short `SOXX` when it is rich versus `QQQ` and `QQQ` is below its 50-day moving average
+- otherwise remain in `QQQ`
+
+This filtered version is designed to avoid fading semiconductors during larger big-tech downtrends while still capturing some downside when the spread is stretched in a weak regime.
 
 ## PDF Summary Structure
 
@@ -99,7 +120,7 @@ Best options for the one-slide deck:
 
 - normalized performance plus one takeaway sentence
 - rolling correlation plus one sentence on supply-chain linkage
-- strategy comparison if the strategy result is strong enough to discuss
+- strategy comparison if one of the three variants is strong enough to discuss
 
 ## What To Update If the Notebook Changes
 
@@ -110,4 +131,6 @@ Best options for the one-slide deck:
 - GARCH usage
 - regression feature set
 - strategy rule
+- trend filter definition
+- short-side rule
 - report / slide recommendations
