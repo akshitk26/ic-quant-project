@@ -5,7 +5,7 @@ tmp/
 .tmp/
 ignore/
 outputs/
-node_modules/
+node_modules
 mplconfig/
 .mplconfig/
 .mplconfit/
