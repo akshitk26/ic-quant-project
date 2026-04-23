@@ -254,6 +254,12 @@ A clean one-slide structure:
 - The biased regime chart is useful because it shows how easy it is to create a false positive in backtesting.
 - The strongest final takeaway is about the limits of simple sector-hedging assumptions.
 
+## Report Editing
+
+- Edit the PDF text in [defense_vs_tech_summary_report_source.md](/Users/akshit/Code/IC%20Quant%20Project/defense_vs_tech_summary_report_source.md:1)
+- Rebuild the PDF with [build_defense_vs_tech_report.py](/Users/akshit/Code/IC%20Quant%20Project/build_defense_vs_tech_report.py:1)
+- The script regenerates the charts and rewrites [defense_vs_tech_summary_report.pdf](/Users/akshit/Code/IC%20Quant%20Project/defense_vs_tech_summary_report.pdf:1)
+
 
 ## Notebook Maintenance
 
