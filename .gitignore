@@ -1,6 +1,11 @@
 venv/
+.venv/
 docs/
 tmp/
+.tmp/
 ignore/
 outputs/
 node_modules/
+mplconfig/
+.mplconfig/
+.mplconfit/
