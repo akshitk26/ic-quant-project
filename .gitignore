@@ -1,5 +1,6 @@
 venv/
 docs/
-temp/
+tmp/
 ignore/
 outputs/
+node_modules/
