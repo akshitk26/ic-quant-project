@@ -17,9 +17,10 @@ This file tracks the notebook structure, documents major implementation choices,
 9. Section 1: core correlation and risk analysis
 10. Section 2: regime strategy, including the original biased false-positive chart and the corrected lagged version
 11. Section 3: drawdown-triggered lowest-beta strategy
-12. Insight generation
-13. Optional exports
-14. Reflection prompts
+12. Section 4: momentum with defense filter strategy
+13. Insight generation
+14. Optional exports
+15. Reflection prompts
 
 ## Current High-Level Decisions
 
@@ -46,6 +47,11 @@ This file tracks the notebook structure, documents major implementation choices,
 - A second strategy test is now included:
   - if `XLK` drawdown breaches `-10%`, switch the next day into the defense stock with the lowest rolling beta to `XLK`
   - otherwise remain in `XLK`
+- A third strategy test is now included:
+  - keep `XLK` by default
+  - only rotate if `XLK` 30-day momentum is negative
+  - require a defense stock to have positive 30-day momentum and lower rolling volatility than `XLK`
+  - if multiple defense stocks qualify, choose the one with the strongest momentum
 - The notebook now explicitly preserves the original biased regime chart as a cautionary example of a false positive.
 - Strategy discussion remains high level. The notebook is analytical first, not a full trading-system build.
 
@@ -81,6 +87,7 @@ This file tracks the notebook structure, documents major implementation choices,
 - Regime-strategy versus `XLK` comparison chart
 - Biased regime-strategy versus `XLK` cautionary chart
 - Drawdown-triggered lowest-beta strategy versus `XLK` comparison chart
+- Momentum-defense filter strategy versus `XLK` comparison chart
 
 ### Modeling / Statistical Analysis
 
@@ -91,6 +98,7 @@ This file tracks the notebook structure, documents major implementation choices,
 - Simple regime-switching backtest compared with `XLK`
 - Backtest now uses one-day-lagged signals rather than same-day execution
 - Drawdown-triggered lowest-beta strategy compared with `XLK`
+- Momentum-defense filter strategy compared with `XLK`
 - Regression diagnostics:
   - `R^2`
   - adjusted `R^2`
@@ -106,6 +114,7 @@ This file tracks the notebook structure, documents major implementation choices,
 - High-level strategy framing
 - Regime definitions explained directly in the notebook
 - Explicit comparison between biased and unbiased backtests
+- Multiple strategy tests with progressively narrower decision rules
 - Reflection questions for the written report
 
 ## How to Structure the PDF Summary
@@ -150,6 +159,7 @@ Recommended structure:
 - volatility-regime classification
 - regime-switching benchmark logic
 - drawdown-triggered lowest-beta logic
+- momentum-defense filter logic
 - OLS hedge ratio estimation
 - Keep this section concise and readable for a non-technical audience
 
@@ -166,6 +176,7 @@ Recommended structure:
 - whether the simple regime strategy improved risk-adjusted behavior against `XLK`
 - whether the strategy still holds up after removing lookahead bias
 - whether the drawdown-triggered lowest-beta rule improves drawdown control or just sacrifices upside
+- whether the momentum-defense filter preserves enough tech upside while avoiding weak periods
 - which stock had the cleanest hedge relationship with `XLK`
 
 ### 5. Interpretation / Strategy Implication
