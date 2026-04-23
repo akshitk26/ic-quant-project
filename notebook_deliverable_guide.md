@@ -13,9 +13,10 @@ The final version is cleaner than the earlier drafts, but it still keeps the two
 - the regime strategy
 - the momentum-with-defense-filter strategy
 
-The notebook now balances three things:
+The notebook now balances four things:
 
 - clean descriptive analysis
+- GARCH-based volatility modeling
 - light regression / regularization modeling
 - a compact strategy section that illustrates what did and did not work
 
@@ -26,8 +27,8 @@ The notebook now balances three things:
 3. Imports and config
 4. Data choices and cleaning notes
 5. Data loading / preprocessing
-6. Concepts for `R^2`, `TSS`, `RSS`, Ridge, and Lasso
-7. Core statistics, regression diagnostics, regularization, and strategy tables
+6. Concepts for GARCH, `R^2`, `TSS`, `RSS`, Ridge, and Lasso
+7. Core statistics, GARCH volatility, regression diagnostics, regularization, and strategy tables
 8. Core visualizations
 9. Chart interpretation notes
 10. Strategy Section 1: regime strategy
@@ -72,6 +73,7 @@ Those sections made the notebook longer without improving the main story enough.
 
 - normalized price performance chart
 - 30-day rolling annualized volatility chart
+- GARCH conditional volatility chart
 - full-period correlation heatmap
 - 30-day rolling correlation versus `XLK`
 - return distribution comparison
@@ -123,6 +125,7 @@ Perform any necessary normalization, resampling, or smoothing.
 Notebook match:
 - normalized price chart with base `100`
 - rolling 30-day volatility and correlation windows for smoothing
+- GARCH conditional volatility as a model-based volatility estimate
 
 ### 2. Exploratory Data Analysis
 
@@ -132,6 +135,7 @@ Generate time-series visualizations to highlight key patterns or anomalies.
 Notebook match:
 - normalized performance
 - rolling volatility
+- GARCH conditional volatility
 - rolling correlation
 - return distributions
 - strategy comparison charts
@@ -141,6 +145,7 @@ Compute and visualize moving averages, rolling volatility, correlations, or auto
 
 Notebook match:
 - rolling volatility
+- GARCH volatility modeling
 - rolling correlation
 - momentum filter logic indirectly uses rolling trend information
 
@@ -157,6 +162,7 @@ Rubric item:
 Choose and apply a suitable time-series model.
 
 Notebook match:
+- GARCH volatility model
 - pair regression framework
 - next-day predictive comparison using lagged-return features with OLS, Ridge, and Lasso
 
@@ -247,3 +253,9 @@ A clean one-slide structure:
 - The regularization section adds a modest predictive extension without making the notebook feel overbuilt.
 - The biased regime chart is useful because it shows how easy it is to create a false positive in backtesting.
 - The strongest final takeaway is about the limits of simple sector-hedging assumptions.
+
+
+## Notebook Maintenance
+
+- Comments were added directly in the code cells to make the notebook easier to read during presentation and editing.
+- Comments stay short and functional so the notebook does not become visually noisy.
